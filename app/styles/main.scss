@@ -1,0 +1,285 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 54px 1fr 45px;
+  grid-template-areas: "header header" "sidenav main" "footer footer";
+  height: 100vh;
+  overflow: hidden; /* Prevent overall container overflow */
+}
+
+.header {
+  grid-area: header;
+  background-color: #fff;
+  padding: 6px 0px 6px 10px;
+  display: flex;
+  align-items: center; /* Center align all header items vertically */
+}
+
+.main {
+  grid-area: main;
+  background-color: #faf9f8;
+  padding-left: 40px;
+  padding-right: 32px;
+  padding-bottom: 20px; /* Add bottom padding to prevent content touching footer */
+  max-width: calc(100vw - 250px);
+  height: calc(100vh - 99px); /* Fixed height calculation (header + footer) */
+  overflow-y: auto; /* Allow vertical scrolling within main area only */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+.footer {
+  grid-area: footer;
+  background-color: #f3f2f1;
+  padding: 12px 20px;
+  z-index: 10; /* Ensure footer stays above content */
+}
+
+.sidenav {
+  grid-area: sidenav;
+  background-color: #fff;
+  padding: 25px;
+  height: calc(100vh - 99px); /* Match main area height */
+  overflow-y: auto; /* Allow sidenav to scroll independently if needed */
+}
+
+body {
+  background-color: rgba(225, 223, 221, 0.2);
+  min-height: 611px;
+  margin: 0;
+  overflow: hidden; /* Prevent body scrolling */
+}
+
+.page-title {
+  padding: 52px 0px;
+}
+
+.card {
+  background: #fff;
+  padding: 28px;
+  margin-bottom: 28px;
+  border-radius: 2px;
+  background-clip: padding-box;
+}
+
+.title {
+  padding: 0px 14px 0px 14px;
+  color: #737373;
+  margin: 6px 0px 6px 10px;
+  border-left: 1px solid darkgray;
+  width: 220px;
+}
+
+.header-message {
+  margin-left: auto; /* Push the message to the right side of the header */
+  padding-right: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 44px;
+}
+
+.logoBottom {
+  height: 35px;
+}
+
+
+/* axis tick labels */
+svg.chart g.axis text
+/* sets all tick text as grey 100 */
+{
+  font-size: 14px;
+  fill: #414042;
+}
+
+/* overwrites x-axis as grey 75 */
+svg.chart g.x.axis text
+{
+  fill:#707071;
+}
+
+/* if axis has class numeric, make it grey75 */
+svg.chart g.axis.numeric text{
+  fill: #707071;
+}
+
+/* if axis has class categorical, make it grey100 */
+svg.chart g.axis.categorical text{
+  fill:#414042;
+}
+
+
+
+/* this sets the labels for the axis */
+.axis--label{
+  font-size: 14px;
+  fill: #707071;
+}
+
+
+/* do not show the line that runs the domain of the axis */
+svg.chart g.axis path.domain
+/* required */
+{
+  display:none;
+}
+
+/* this sets the ticks */
+svg.chart .axis line
+{
+  stroke: #d9d9d9;
+  shape-rendering: crispEdges;
+}
+
+/* this sets zero line */
+
+g.tick line.zero-line
+{
+  stroke: #B3B3B3;
+  stroke-width: 1.5px;
+  shape-rendering: crispEdges;
+}
+
+
+/* this sets the style for lines charts */
+path.line{
+  fill:none;
+}
+
+
+/* source */
+h5#source {
+  font-size: 16px;
+  margin: 16px 0 8px 0;
+  font-weight: 400;
+  color: #707071;
+}
+
+/* legend div */
+#legend{
+  display:flex;
+  flex-wrap: wrap;
+}
+
+.legend--item {
+  display:flex;
+  padding-right:40px;
+  padding-bottom: 12px;
+}
+
+.legend--icon--circle {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* a legend circle with a border for scatterplots */
+
+.legend--icon--circle2 {
+  height: 12px;
+  width: 12px;
+  border-radius: 50%;
+  align-self: center;
+  flex-shrink: 0;
+  border:2px solid
+}
+
+.legend--icon--refline {
+  height: 3px;
+  width: 20px;
+  align-self: center;
+  flex-shrink: 0;
+
+}
+
+.legend--text{
+  color:#707070;
+  line-height: 14px;
+  font-size: 14px;
+  padding-left: 12px;
+  margin:0;
+}
+
+/* Custom GLA gray/black styling */
+.gla-gray-text {
+    color: #4d4d4d; /* GLA gray/black colour */
+    font-weight: 600;
+}
+
+
+// Theme Description Component Styles
+.theme-description {
+  color: #323130;
+  text-align: left;
+  position: relative;
+  padding: 16px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  .theme-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: bold;
+    
+    h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+  }
+
+  .indicator {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 10px;
+    font-weight: bold;
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 12px;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    &-warning {
+      color: #d32f2f;
+      background-color: #ffebee;
+      border: 2px solid #d32f2f;
+    }
+    
+    &-success {
+      color: #388e3c;
+      background-color: #e8f5e9;
+      border: 2px solid #388e3c;
+    }
+  }
+
+  .indicator-icon {
+    margin-right: 5px;
+    font-size: 14px;
+  }
+
+  .description-title {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  .bullet-point {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+
+  .bullet {
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .theme-content {
+    font-size: 14px;
+  }
+}

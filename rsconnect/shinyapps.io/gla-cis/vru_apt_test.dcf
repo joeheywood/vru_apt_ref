@@ -1,0 +1,10 @@
+name: vru_apt_test
+title: VRU APT (Test)
+username: gla-cis
+account: gla-cis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17043927
+bundleId: 11795218
+url: https://gla-cis.shinyapps.io/vru_apt_test/
+version: 1

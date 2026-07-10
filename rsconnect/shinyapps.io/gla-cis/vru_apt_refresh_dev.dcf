@@ -1,0 +1,10 @@
+name: vru_apt_refresh_dev
+title: vru apt (data refresh dev version)
+username: gla-cis
+account: gla-cis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16928347
+bundleId: 12244672
+url: https://gla-cis.shinyapps.io/vru_apt_refresh_dev/
+version: 1

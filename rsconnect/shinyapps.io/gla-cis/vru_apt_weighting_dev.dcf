@@ -1,0 +1,10 @@
+name: vru_apt_weighting_dev
+title: VRU APT (Weighting Dev Version)
+username: gla-cis
+account: gla-cis
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16384978
+bundleId: 11478830
+url: https://gla-cis.shinyapps.io/vru_apt_weighting_dev/
+version: 1

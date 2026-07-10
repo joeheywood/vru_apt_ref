@@ -1,0 +1,41 @@
+theme,indicator,weighting,name
+Communities & Place,pass_backgrounds_score,1,Community Cohesion
+Communities & Place,pass_fairness_score,1,Police Fairness
+Communities & Place,pass_gangs_score,1,Gang Issues
+Communities & Place,pass_good_job_score,1,Police Performance
+Communities & Place,pass_gun_crime_score,1,Gun Crime Concern
+Communities & Place,pass_knife_crime_score,1,Knife Crime Concern
+Communities & Place,pass_trust_mps_score,1,Trust in Police
+CYP-Opportunities,NEET,1,NEET
+CYP-Opportunities,Unemployment,1,Unemployment
+CYP-Reducing Harm,Gun Crime,1,Gun Crime
+CYP-Reducing Harm,Homicide,1,Homicide
+CYP-Reducing Harm,Knife Crime,1,Knife Crime
+CYP-Reducing Harm,Knife Injury Victims 1 24,1,Knife Injury Victims 1 24
+CYP-Reducing Harm,Lethal Barrel Discharge,1,Lethal Barrel Discharge
+CYP-Reducing Harm,Other Sexual Offences,1,Other Sexual Offences
+CYP-Reducing Harm,Rape,1,Rape
+CYP-Reducing Harm,Robbery Of Personal Property,1,Robbery Of Personal Property
+CYP-Reducing Harm,Total Alcohol,1,LAS callouts to alcohol-related incidents
+CYP-Reducing Harm,Total Assault,-1,LAS callouts to Assault
+CYP-Reducing Harm,Total Gun,1,LAS callouts to gun injury
+CYP-Reducing Harm,Total Knife,1,LAS callouts to knife injury
+CYP-Reducing Harm,Total Overdose,1,LAS callouts to drug overdoses
+CYP-Reducing Harm,Total Self Harm,1,LAS callouts to self harm injury
+CYP-Reducing Harm,Total Sex Injury,1,LAS callouts to rape or sexual assault
+CYP-Reducing Harm,Total Youth Violence,1,LAS callouts to Youth violence
+CYP-Reducing Harm,Violence With Injury,1,Violence With Injury
+CYP-Reducing Harm,Violence Without Injury,1,Violence Without Injury
+Education,EYFS,1,EYFS
+Education,Persistent absenteeism,1,Persistent absenteeism
+Education,socio emotional needs,1,socio emotional needs
+Education,Total permanent exclusions,1,Total permanent exclusions
+Education,Total Suspensions,1,Total Suspensions
+Families,Child Protection Plans,1,Child Protection Plans
+Families,Children in Care,1,Children in Care
+Families,Domestic Abuse,1,Domestic Abuse
+Families,Domestic Abuse Violence With Injury,1,Domestic Abuse Violence With Injury
+Families,Household is deprived in four dimensions,1,Household is deprived in four dimensions
+Families,Household is deprived in three dimensions,1,Household is deprived in three dimensions
+Families,IDACI,1,IDACI
+Ranking - Combined Indicators,Ranking - Combined Indicators,-1,Ranking - Combined Indicators

@@ -1,0 +1,31 @@
+default:
+  rhino_log_level: !expr Sys.getenv("RHINO_LOG_LEVEL", "INFO")
+  rhino_log_file: !expr Sys.getenv("RHINO_LOG_FILE", NA)
+
+  dataconnection:
+    driver: 'PostgreSQL ANSI'
+    server: "vru-db.cmcxztaeo4nk.eu-west-2.rds.amazonaws.com"
+    uid: "postgres"
+    pwd: "yOusjPJ8EOpPmX2933ey56xB7L5815Y7r"
+    port: 5432
+    database: "vrudb"
+
+local:
+  dataconnection:
+    driver: "PostgreSQL Unicode"
+    # driver: 'PostgreSQL'
+    server: "vru-db.cmcxztaeo4nk.eu-west-2.rds.amazonaws.com"
+    uid: "postgres"
+    pwd: "yOusjPJ8EOpPmX2933ey56xB7L5815Y7r"
+    port: 5432
+    database: "vrudb"
+
+shinyapps:
+  dataconnection:
+    driver: 'PostgreSQL ANSI'
+    server: "vru-db.cmcxztaeo4nk.eu-west-2.rds.amazonaws.com"
+    uid: "postgres"
+    pwd: "yOusjPJ8EOpPmX2933ey56xB7L5815Y7r"
+    port: 5432
+    database: "vrudb"
+

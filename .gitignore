@@ -1,0 +1,13 @@
+.Rhistory
+.RData
+.Ruserdata
+
+.Rproj.user/
+
+node_modules/
+
+*.log
+
+renv/staging/
+
+.DS_Store

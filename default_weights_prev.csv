@@ -1,0 +1,41 @@
+theme,indicator,weighting
+Communities & Place,pass_backgrounds_score,1
+Communities & Place,pass_fairness_score,1
+Communities & Place,pass_gangs_score,1
+Communities & Place,pass_good_job_score,1
+Communities & Place,pass_gun_crime_score,1
+Communities & Place,pass_knife_crime_score,1
+Communities & Place,pass_trust_mps_score,1
+CYP-Opportunities,NEET,1
+CYP-Opportunities,Unemployment,1
+CYP-Reducing Harm,Gun Crime,1
+CYP-Reducing Harm,Homicide,1
+CYP-Reducing Harm,Knife Crime,1
+CYP-Reducing Harm,Knife Injury Victims 1 24,1
+CYP-Reducing Harm,Lethal Barrel Discharge,1
+CYP-Reducing Harm,Other Sexual Offences,1
+CYP-Reducing Harm,Rape,1
+CYP-Reducing Harm,Robbery Of Personal Property,1
+CYP-Reducing Harm,Total Alcohol,1
+CYP-Reducing Harm,Total Assault,-1
+CYP-Reducing Harm,Total Gun,1
+CYP-Reducing Harm,Total Knife,1
+CYP-Reducing Harm,Total Overdose,1
+CYP-Reducing Harm,Total Self Harm,1
+CYP-Reducing Harm,Total Sex Injury,1
+CYP-Reducing Harm,Total Youth Violence,1
+CYP-Reducing Harm,Violence With Injury,1
+CYP-Reducing Harm,Violence Without Injury,1
+Education,EYFS,1
+Education,Persistent absenteeism,1
+Education,socio emotional needs,1
+Education,Total permanent exclusions,1
+Education,Total Suspensions,1
+Families,Child Protection Plans,1
+Families,Children in Care,1
+Families,Domestic Abuse,1
+Families,Domestic Abuse Violence With Injury,1
+Families,Household is deprived in four dimensions,1
+Families,Household is deprived in three dimensions,1
+Families,IDACI,1
+
