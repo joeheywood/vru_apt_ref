@@ -122,7 +122,8 @@ server <- function(id) {
           show_loading()
           
           # Initialise module
-          map$server("map")
+          #### DISABLED MAP PAGE SERVER ####
+          # map$server("map")
           
           # Mark as loaded and hide loading screen
           module_status$map_loaded <- TRUE
@@ -143,7 +144,8 @@ server <- function(id) {
           show_loading()
           
           # Initialise module
-          wards$server("wards")
+          #### DISABLED wards PAGE SERVER ####
+          # wards$server("wards")
           
           # Mark as loaded and hide loading screen
           module_status$wards_loaded <- TRUE
@@ -164,8 +166,9 @@ server <- function(id) {
           show_loading()
           
           # Initialise module
-          wt <- weighting$server("weighting")
-          dwn <-downloads$server("downloads", wt)
+          #### DISABLED weighting PAGE SERVER ####
+          # wt <- weighting$server("weighting")
+          # dwn <-downloads$server("downloads", wt)
           
           
           # Add slight delay before hiding loading to ensure UI has updated
@@ -184,6 +187,7 @@ server <- function(id) {
           show_loading()
           
           # Initialise module
+          #### DISABLED borough weighting PAGE SERVER ####
           wt <- weighting_boro$server("weighting_boro")
           
           
