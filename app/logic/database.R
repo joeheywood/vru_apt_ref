@@ -10,6 +10,7 @@ box::use(
 #' @export
 init_connection <- function() {
   conn_args <- config::get("dataconnection")
+  a <- Sys.time()
 
   tryCatch(
     {
@@ -23,7 +24,8 @@ init_connection <- function() {
         password = conn_args$pwd,
         sslmode  = conn_args$sslmode # Enable SSL/TLS - AWS will not run without
       )
-      message("Successfully connected to database")
+      message(paste0("T: ", Sys.time() - a))
+      message("Successfully connected to database " )
       return(con)
     },
     error = function(e) {
@@ -70,6 +72,7 @@ get_data_for_weighting <- function() {
 
 #' @export
 query_ward_data <- function(theme = NULL, borough = NULL, ward = NULL) {
+  a <- Sys.time()
   con <- init_connection()
   on.exit(DBI::dbDisconnect(con))
   
@@ -124,5 +127,6 @@ query_ward_data <- function(theme = NULL, borough = NULL, ward = NULL) {
   
   
   
+  message(paste0("Querying ward data: ", Sys.time() - a))
   return(result)
 }

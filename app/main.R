@@ -17,7 +17,7 @@ box::use(
   app / view / weighting,
   app / view / weighting_boro,
   app / view / downloads,
-  app / logic / database[init_connection],
+  # app / logic / database[init_connection],
 )
 
 # parseTheme("app/logic/theme.json") # custom theming for the application.
@@ -87,11 +87,13 @@ server <- function(id) {
     ns <- session$ns
     print(glue("USER: {session$user}"))
     
+    PERF_MODE <- TRUE
+    
     # Initialise router with default route
     router_server("home")
     
     # Initialise database connection
-    con <- init_connection()
+    # con <- init_connection()
     
     # Initialise module status tracking
     module_status <- reactiveValues(
@@ -123,7 +125,9 @@ server <- function(id) {
           
           # Initialise module
           #### DISABLED MAP PAGE SERVER ####
-          # map$server("map")
+          if(TRUE) {
+            map$server("map")
+          }
           
           # Mark as loaded and hide loading screen
           module_status$map_loaded <- TRUE
@@ -145,7 +149,9 @@ server <- function(id) {
           
           # Initialise module
           #### DISABLED wards PAGE SERVER ####
-          # wards$server("wards")
+          if(!PERF_MODE) {
+            wards$server("wards")
+          }
           
           # Mark as loaded and hide loading screen
           module_status$wards_loaded <- TRUE
@@ -167,8 +173,10 @@ server <- function(id) {
           
           # Initialise module
           #### DISABLED weighting PAGE SERVER ####
-          # wt <- weighting$server("weighting")
-          # dwn <-downloads$server("downloads", wt)
+          if (!PERF_MODE) {
+            wt <- weighting$server("weighting")
+            dwn <-downloads$server("downloads", wt)
+          }
           
           
           # Add slight delay before hiding loading to ensure UI has updated

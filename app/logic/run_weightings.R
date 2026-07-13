@@ -21,7 +21,17 @@ run_weightings <- function(weightings) {
    # saveRDS(inds, file = "default_weights.RDS")
   inds <- readRDS("default_weights.RDS")
   
+  rev_inds <- c(
+    "pass_backgrounds_score",
+    "pass_fairness_score",
+    "pass_good_job_score"
+    )
+  
+  dt$value[which(dt$indicator %in% rev_inds)] <- 1000 - dt$value[which(dt$indicator %in% rev_inds)]
+  
   inds <- inds[which(inds$weighting >= 0),]
+  
+  
 
   scores <- map_df(unique(inds$indicator), run_for_indicator, dt = dt) %>%
     apply_weightings(weightings)
