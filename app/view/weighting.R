@@ -114,20 +114,20 @@ server <- function(id) {
     hide("download")
     print(glue("USER: {session$user} using weighting page"))
 
-    # Display name mapping for pass_* indicators
-    # pass_display_names <- c(
-    #   pass_backgrounds_score = "Community Cohesion",
-    #   pass_fairness_score = "Police Fairness",
-    #   pass_gangs_score = "Gang Issues",
-    #   pass_good_job_score = "Police Performance",
-    #   pass_gun_crime_score = "Gun Crime Concern",
-    #   pass_knife_crime_score = "Knife Crime Concern",
-    #   pass_trust_mps_score = "Trust in Police"
-    # )
+    #Display name mapping for pass_* indicators
+    pass_display_names <- c(
+      pass_backgrounds_score = "Community Cohesion",
+      pass_fairness_score = "Police Fairness",
+      pass_gangs_score = "Gang Issues",
+      pass_good_job_score = "Police Performance",
+      pass_gun_crime_score = "Gun Crime Concern",
+      pass_knife_crime_score = "Knife Crime Concern",
+      pass_trust_mps_score = "Trust in Police"
+    )
 
-    # display_name <- function(ind) {
-    #   ifelse(ind %in% names(pass_display_names), pass_display_names[ind], ind)
-    # }
+    display_name <- function(ind) {
+      ifelse(ind %in% names(pass_display_names), pass_display_names[ind], ind)
+    }
 
     # --- 1. DATA INITIALIZATION ---
     # inds_raw <- read_csv("default_weights.csv")
@@ -277,26 +277,26 @@ server <- function(id) {
     # Ward Drill-down
     observeEvent(input$top_wards_rows_selected, {
       req(rv$top_wards)
-      df <- inds_base |>
-        left_join(weights(), by = "indicator")
-      # print(names(df))
-      ward <- rv$top_wards$wd22nm[input$top_wards_rows_selected]
-      output$ward_points <- renderText(glue("Indicators for {ward}"))
-      
-      dets <- get_inds_scores_for_ward(ward, df)  %>%
-        arrange(desc(score), rank_n) %>%
-        filter(score > 0) %>%
-        mutate(indicator = display_name(indicator)) %>%
-        select(indicator, score, rank_n)
-
-      output$ward_points_tbl <- renderDT({
-        datatable(
-          dets,
-          colnames = c("Indicator", "Contribution to Score", "Rank"),
-          options = list(dom = 't', paging = FALSE),
-          rownames = FALSE
-        )
-      })
+      # df <- inds_base |>
+      #   left_join(weights(), by = "indicator")
+      # # print(names(df))
+      # ward <- rv$top_wards$wd22nm[input$top_wards_rows_selected]
+      # output$ward_points <- renderText(glue("Indicators for {ward}"))
+      # 
+      # dets <- get_inds_scores_for_ward(ward, df)  %>%
+      #   arrange(desc(score), rank_n) %>%
+      #   filter(score > 0) %>%
+      #   mutate(indicator = display_name(indicator)) %>%
+      #   select(indicator, score, rank_n)
+      # 
+      # output$ward_points_tbl <- renderDT({
+      #   datatable(
+      #     dets,
+      #     colnames = c("Indicator", "Contribution to Score", "Rank"),
+      #     options = list(dom = 't', paging = FALSE),
+      #     rownames = FALSE
+      #   )
+      # })
     })
     return(rv)
   })

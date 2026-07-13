@@ -63,7 +63,7 @@ get_data_for_weighting <- function() {
   con <- init_connection()
   on.exit(DBI::dbDisconnect(con))
   # return(dbGetQuery(con, glue_sql("SELECT lad22nm, wd22nm, indicator, value, rank_n FROM apt_data_2025")))
-  return(dbGetQuery(con, glue_sql("SELECT lad22nm, wd22nm, indicator, value, rank_n FROM vru_apt_dev_table")))
+  return(dbGetQuery(con, "SELECT lad22nm, wd22nm, indicator, value, rank_n FROM vru_apt_dev_table"))
   
 }
 

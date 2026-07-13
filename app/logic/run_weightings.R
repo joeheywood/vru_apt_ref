@@ -22,9 +22,22 @@ run_weightings <- function(weightings) {
   inds <- readRDS("default_weights.RDS")
   
   inds <- inds[which(inds$weighting >= 0),]
+  
+  rev_inds <- c(
+    "pass_backgrounds_score",
+    "pass_fairness_score",
+    "pass_good_job_score",
+    "pass_trust_mps_score"
+    )
+  
+  #save(dt, rev_inds, file = "debug_inds.RData")
+  dt$value[which(dt$indicator %in% rev_inds)] <- 1000 -  dt$value[which(dt$indicator %in% rev_inds)]
+  
+  
 
   scores <- map_df(unique(inds$indicator), run_for_indicator, dt = dt) %>%
     apply_weightings(weightings)
+  
 
   scores %>% summarise(.by = c(lad22nm, wd22nm), score = sum(score)) %>%
     arrange(desc(score))
@@ -41,6 +54,15 @@ run_weightings_borough <- function(weightings) {
   
   
   inds <- inds[which(inds$weighting >= 0),]
+  
+  
+  rev_inds <- c(
+    "pass_backgrounds_score",
+    "pass_fairness_score",
+    "pass_good_job_score",
+    "pass_trust_mps_score"
+  )
+  dt$value[which(dt$indicator %in% rev_inds)] <- 1000 -  dt$value[which(dt$indicator %in% rev_inds)]
   
   
   scores <- map_df(unique(inds$indicator), run_for_indicator_boro, dt = dt) %>%
