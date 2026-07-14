@@ -210,10 +210,10 @@ server <- function(id) {
     
     # Disconnect when session ends
     session$onSessionEnded(function() {
-      if (!is.null(con)) {
-        DBI::dbDisconnect(con)
-        message("Database connection closed")
-      }
+      # if (!is.null(con)) {
+      #   DBI::dbDisconnect(con)
+      #   message("Database connection closed")
+      # }
     })
   })
 }

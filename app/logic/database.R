@@ -130,3 +130,15 @@ query_ward_data <- function(theme = NULL, borough = NULL, ward = NULL) {
   message(paste0("Querying ward data: ", Sys.time() - a))
   return(result)
 }
+
+
+#' @export
+query_ward_data_by_indicator <- function(indicator) {
+  a <- Sys.time()
+  con <- init_connection()
+  on.exit(DBI::dbDisconnect(con))
+  query <- glue("SELECT wd22cd, indicator, value FROM vru_apt_dev_table WHERE indicator = '{indicator}'")
+  result <- dbGetQuery(con, query)
+  message(paste0("Querying ward data: ", Sys.time() - a))
+  return(result)
+}

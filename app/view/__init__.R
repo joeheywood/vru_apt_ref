@@ -50,8 +50,8 @@ get_ward_mapping_data <- memoise::memoise(
 )
 
 # For backward compatibility - full dataset
-#' @export
-ward_mapping_data <- get_ward_mapping_data()
+# @export
+# ward_mapping_data <- get_ward_mapping_data()
 
 # Constants
 #' @export
