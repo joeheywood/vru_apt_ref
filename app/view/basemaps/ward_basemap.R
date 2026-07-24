@@ -4,6 +4,7 @@ box::use(
   shiny[...],
   shiny.fluent[...],
   leaflet[...],
+  glue[...],
   r2d3[r2d3, renderD3, d3Output],
   purrr[map2, discard],
   janitor[make_clean_names],
@@ -31,27 +32,41 @@ server <- function(id, ward_data, selected_ward) {
       fillColor = "#228B22",
       fillOpacity = 0.5
     )
+    
+    initial_ward_data <- reactiveVal(NULL)
+    
+    observeEvent(ward_data(), {
+      if (is.null(initial_ward_data())) {
+        initial_ward_data(ward_data())
+      }
+    }, once = TRUE)
+    
 
-    # Initial map render - now using reactive ward_data
+    
+    # first_run <- reactive({1}) 
     output$ward_map <- renderLeaflet({
-      req(ward_data())  # Ensure data is available
+      req(initial_ward_data())  # Ensure data is available
+      print("RUNNING MAP. SHOULD HAPPEN ONCE.")
       
       leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
         setView(-0.118092, 51.509865, zoom = 10) |>
         addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
         addPolygons(
-          data = ward_data(),  # Call the reactive
+          data = initial_ward_data(),  # Call the reactive
           layerId = ~wd22cd,
           fillColor = FALSE,
           color = "black",
           weight = 1
         )
-    })
-
+    })       
+    
+    
+    
     # Observer to update the map when the selected ward changes
     observeEvent(selected_ward(), {
       req(selected_ward())
       req(ward_data())  # Ensure data is available
+      print("Proxy leaflet. Ward now selected")
 
       # Filter using wd22cd instead of ward_name
       selected_ward_code <- selected_ward()

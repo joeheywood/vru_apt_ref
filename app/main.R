@@ -149,7 +149,8 @@ server <- function(id) {
           
           # Initialise module
           #### DISABLED wards PAGE SERVER ####
-          if(!PERF_MODE) {
+          # if(!PERF_MODE) {
+          if(TRUE) {
             wards$server("wards")
           }
           

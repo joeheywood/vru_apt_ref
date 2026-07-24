@@ -14,6 +14,7 @@ prepare_beeswarm_data <- function(selected_indicator, data) {
   if (is.null(selected_indicator) || is.null(data)) {
     return(NULL)
   }
+  message("here?")
 
   #* This is the actual data that goes into the beeswarm
   beeswarm_data <- data |>

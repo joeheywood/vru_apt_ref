@@ -21,7 +21,7 @@ box::use(
   app / view / charts / ranking_chart,
   app / logic / database[query_ward_data_by_indicator],
   app / logic / rankingChart_utilis[prepare_rankingchart_data],
-  # app / view[ward_mapping_data, url_temp, os_mapsattr], # Where is this?
+  app / view[ward_mapping_data, url_temp, os_mapsattr], # Where is this?
   app / view[url_temp, os_mapsattr], # Where is this?
   app / view / react[ProfileMetaData], # Meta data component for this section
 )
@@ -108,11 +108,14 @@ ui <- function(id) {
   )
 }
 
+
 #' @export
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
-    quicker <- TRUE
-    if(!quicker) {
+    quicker <- FALSE
+    if(quicker) {
+      wards_sf <- readRDS("app/data/wards.rds")
+    } else {
       ward_json_data2 <- ward_mapping_data
       
     }
@@ -258,16 +261,21 @@ server <- function(id) {
       validate(need(!rv$theme_changed, "Please select an indicator"))
       req(input$themeInput, input$indicatorInput)
       a <- Sys.time()
-
-      # dt <- ward_json_data2 |>
-      #   filter(
-      #     theme == input$themeInput,
-      #     indicator == input$indicatorInput
-      #   )
-      wards_sf <- readRDS("app/data/wards.rds")
       
-      x2 <- query_ward_data_by_indicator(input$indicatorInput)
-      dt <- left_join(wards_sf, x2, by = "wd22cd")
+      if(quicker) {
+        x2 <- query_ward_data_by_indicator(input$indicatorInput)
+        dt <- left_join(wards_sf, x2, by = "wd22cd")
+        
+      } else {
+        dt <- ward_json_data2 |>
+          filter(
+            theme == input$themeInput,
+            indicator == input$indicatorInput
+          )
+        
+      }
+
+      
 
 
       message(paste0("data for maps ready: ", Sys.time() - a))
@@ -304,7 +312,7 @@ server <- function(id) {
         )
       })
 
-      leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
+      l <- leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
         setView(-0.118092, 51.509865, zoom = 10) |>
         addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
         addPolygons(
@@ -324,6 +332,9 @@ server <- function(id) {
           lng2 = 0.33402,
           lat2 = 51.69188
         )
+      
+      message(paste0("leaflet render: ", Sys.time() - a))
+      l
     })
 
     # Highlight style

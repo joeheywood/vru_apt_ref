@@ -18,6 +18,7 @@ prepare_multibeeswarm_data <- function(selected_theme, data) {
   }
 
 
+  save(data, selected_theme, file = "debug_theme.RData")
   # This rename assumes that'data' has columns "indicator", "theme", "wd22nm", "value", "lad22nm"
   multibeeswarm_data <- data |>
     filter(theme == selected_theme & !is.na(value) & value != 0) |>

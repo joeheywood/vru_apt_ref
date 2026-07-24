@@ -16,6 +16,7 @@ box::use(
 # file/imports #nolint
 box::use(
   app / view / layout[makeCard],
+  app / logic / database[query_ward_data_by_theme],
   app / logic / beeswarm_utlis[prepare_beeswarm_data],
   app / view / inputs / toggle,
   app / view / basemaps / ward_basemap,
@@ -114,52 +115,63 @@ ui <- function(id) {
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
-    # Load minimal data once for dropdowns (no geometry needed)
-    dropdown_data <- reactive({
-      get_ward_mapping_data() |>
-        sf::st_drop_geometry() |>
-        select(theme, lad22cd, lad22nm, wd22cd, wd22nm) |>
-        distinct()
-    }) |>
-      bindCache("dropdown_data")  # Cache this forever
-    
-    # Pre-compute all dropdown options
-    all_options <- reactive({
-      data <- dropdown_data()
-      
-      # Themes
-      themes <- unique(data$theme)
-      ranking_theme <- "Ranking - Combined Indicators"
-      other_themes <- sort(themes[themes != ranking_theme])
-      
-      # Boroughs (same for all themes)
-      boroughs <- data |>
-        select(lad22cd, lad22nm) |>
-        distinct() |>
-        arrange(lad22nm)
-      
-      # Wards grouped by theme and borough for fast lookup
-      wards_by_theme_borough <- data |>
-        select(theme, lad22cd, wd22cd, wd22nm) |>
-        distinct() |>
-        group_by(theme, lad22cd) |>
-        arrange(wd22nm) |>
-        summarise(
-          wards = list(map2(wd22cd, wd22nm, ~ list(key = .x, text = .y))),
-          .groups = "drop"
+    quicker <- TRUE
+    if(quicker == TRUE) {
+      load("app/data/all_opts.RData")
+      wards_sf <- readRDS("app/data/wards.rds")
+      all_options <- reactive(all_opts)
+    } else {
+      a <- Sys.time()
+      dropdown_data <- reactive({
+        get_ward_mapping_data() |>
+          sf::st_drop_geometry() |>
+          select(theme, lad22cd, lad22nm, wd22cd, wd22nm) |>
+          distinct()
+      }) # |>
+        # bindCache("dropdown_data")  # Cache this forever
+      dd <- dropdown_data()
+      # Pre-compute all dropdown options
+      all_options <- reactive({
+        data <- dropdown_data()
+        
+        # Themes
+        themes <- unique(data$theme)
+        ranking_theme <- "Ranking - Combined Indicators"
+        other_themes <- sort(themes[themes != ranking_theme])
+        
+        # Boroughs (same for all themes)
+        boroughs <- data |>
+          select(lad22cd, lad22nm) |>
+          distinct() |>
+          arrange(lad22nm)
+        
+        # Wards grouped by theme and borough for fast lookup
+        wards_by_theme_borough <- data |>
+          select(theme, lad22cd, wd22cd, wd22nm) |>
+          distinct() |>
+          group_by(theme, lad22cd) |>
+          arrange(wd22nm) |>
+          summarise(
+            wards = list(map2(wd22cd, wd22nm, ~ list(key = .x, text = .y))),
+            .groups = "drop"
+          )
+        
+        list(
+          ranking_theme = ranking_theme,
+          other_themes = map(other_themes, ~ list(key = .x, text = .x)),
+          ranking_theme_option = list(list(key = ranking_theme, text = ranking_theme)),
+          boroughs = map2(boroughs$lad22cd, boroughs$lad22nm, ~ list(key = .x, text = .y)),
+          wards_lookup = wards_by_theme_borough
         )
+      }) # |>
+        # bindCache("all_options")  # Cache this forever too
+      message(paste0("general dropdowns: ", Sys.time() - a))
       
-      list(
-        ranking_theme = ranking_theme,
-        other_themes = map(other_themes, ~ list(key = .x, text = .x)),
-        ranking_theme_option = list(list(key = ranking_theme, text = ranking_theme)),
-        boroughs = map2(boroughs$lad22cd, boroughs$lad22nm, ~ list(key = .x, text = .y)),
-        wards_lookup = wards_by_theme_borough
-      )
-    }) |>
-      bindCache("all_options")  # Cache this forever too
-
+    }
+    
+    # Load minimal data once for dropdowns (no geometry needed)
+    
+    
     # Current active theme based on toggle
     active_theme <- reactive({
       if (input$toggle) {
@@ -171,26 +183,42 @@ server <- function(id) {
 
     # Load ALL data for the selected theme (for beeswarm distribution)
     theme_data <- reactive({
+      a <- Sys.time()
       req(active_theme())
-      
-      get_ward_mapping_data(
-        theme = active_theme(),
-        borough = NULL  # Get all boroughs for this theme
-      ) |>
-        sf::st_drop_geometry()  # Beeswarm doesn't need geometry
+      if(quicker == TRUE) {
+        dt <- query_ward_data_by_theme(active_theme())
+      } else {
+        dt <- get_ward_mapping_data(
+          theme = active_theme(),
+          borough = NULL  # Get all boroughs for this theme
+        ) |>
+          sf::st_drop_geometry()  # Beeswarm doesn't need geometry
+        message(paste0("Theme data: ", Sys.time() - a))
+        
+      }
+
+      dt
     })
 
     # Geometry data for map (filtered by borough if selected)
     basemap_data <- reactive({
+      a <- Sys.time()
       req(active_theme())
-      
-      get_ward_mapping_data(
-        theme = active_theme(),
-        borough = input$boroughInput  # Filter by borough for map
-      ) |>
-        select(wd22cd, wd22nm, lng, lat, geometry)
+      if(quicker == TRUE) {
+        x2 <- query_ward_data_by_theme(active_theme())
+        dt <- left_join(wards_sf, x2, by = "wd22cd")
+        
+      } else {
+        dt <- get_ward_mapping_data(
+          theme = active_theme(),
+          borough = input$boroughInput  # Filter by borough for map
+        ) |>
+          select(wd22cd, wd22nm, lng, lat, geometry)
+      }
+      message(paste0("basemap data: ", Sys.time() - a))
+      dt
     })
-
+    # 
     # Data for beeswarm (all wards in theme)
     selected_dataset <- reactive({
       theme_data()  # This has all wards for the theme
@@ -198,33 +226,37 @@ server <- function(id) {
 
     # Ward-specific data for description
     filtered_dataset <- reactive({
+      a <- Sys.time()
       req(input$wardInput, theme_data())
-      
-      theme_data() |>
+
+      td <- theme_data() |>
         filter(wd22cd == input$wardInput) |>
         slice_head(n = 1)
+      message(paste0("filtered data: ", Sys.time() - a))
+      td
     })
 
     # Send theme description to React
     observe({
       req(filtered_dataset())
-      
+
       theme_text <- filtered_dataset() |>
         select(
           ward = wd22nm,
           theme,
           theme_description,
-          point
+          point ## ?? what? why do we need this?
         ) |>
         as.list()
-      
+
       session$sendCustomMessage("themeDescriptionChange", theme_text)
     })
-
+    # 
     # Initialize dropdowns once
     observe({
+      a <- Sys.time()
       opts <- all_options()
-      
+
       # Set initial theme based on toggle
       if (input$toggle) {
         updateDropdown.shinyInput(
@@ -240,20 +272,22 @@ server <- function(id) {
           options = opts$other_themes
         )
       }
-      
+
       # Set boroughs (always the same)
       updateDropdown.shinyInput(
         session = session,
         inputId = "boroughInput",
         options = opts$boroughs
       )
+      message(paste0("dropdowns: ", Sys.time() - a))
     }) |>
       bindEvent(all_options(), once = TRUE)
-
+    # 
     # Update theme dropdown only when toggle changes
     observeEvent(input$toggle, {
+      a <- Sys.time()
       opts <- all_options()
-      
+
       if (input$toggle) {
         updateDropdown.shinyInput(
           session = session,
@@ -269,14 +303,16 @@ server <- function(id) {
           value = NULL  # Let user choose
         )
       }
+      message(paste0("dropdowns (toggle): ", Sys.time() - a))
     }, ignoreInit = TRUE)
 
     # Update ward dropdown when theme or borough changes
     observe({
       req(active_theme(), input$boroughInput)
-      
+      a <- Sys.time()
+
       opts <- all_options()
-      
+
       # Fast lookup from pre-computed data
       ward_options <- opts$wards_lookup |>
         filter(
@@ -285,7 +321,7 @@ server <- function(id) {
         ) |>
         pull(wards) |>
         first()
-      
+
       if (!is.null(ward_options)) {
         updateDropdown.shinyInput(
           session = session,
@@ -301,15 +337,16 @@ server <- function(id) {
           value = NULL
         )
       }
+      message(paste0("dropdowns (borough/theme change): ", Sys.time() - a))
     })
-
+    # 
     # Create a reactive value for the selected ward
     selected_ward <- reactive({
       input$wardInput
     })
 
     # Call the ward_basemap module
-    ward_basemap$server("ward_basemap", 
+    ward_basemap$server("ward_basemap",
       ward_data = basemap_data,
       selected_ward = selected_ward
     )

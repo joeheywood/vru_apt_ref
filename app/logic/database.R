@@ -142,3 +142,16 @@ query_ward_data_by_indicator <- function(indicator) {
   message(paste0("Querying ward data: ", Sys.time() - a))
   return(result)
 }
+
+
+
+#' @export
+query_ward_data_by_theme <- function(theme) {
+  a <- Sys.time()
+  con <- init_connection()
+  on.exit(DBI::dbDisconnect(con))
+  query <- glue("SELECT wd22cd, theme, lad22nm, lad22cd, wd22nm, theme_description, point, indicator, value FROM vru_apt_dev_table WHERE theme = '{theme}'")
+  result <- dbGetQuery(con, query)
+  message(paste0("Querying ward data (theme): ", Sys.time() - a))
+  return(result)
+}
