@@ -31,16 +31,28 @@ server <- function(id, ward_data, selected_ward) {
       fillColor = "#228B22",
       fillOpacity = 0.5
     )
+    
+    
+    initial_ward_data <- reactiveVal(NULL)
+    
+    # This separates out the initial data from the map, so it doesn't keep re-rendering
+    # every time that ward_data() changes.
+    observeEvent(ward_data(), {
+      if (is.null(initial_ward_data())) {
+        initial_ward_data(ward_data())
+      }
+    }, once = TRUE)
 
     # Initial map render - now using reactive ward_data
     output$ward_map <- renderLeaflet({
-      req(ward_data())  # Ensure data is available
+      # req(ward_data())  # Ensure data is available
+      req(initial_ward_data()) # Ensures this only runs once.
       
       leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
         setView(-0.118092, 51.509865, zoom = 10) |>
         addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
         addPolygons(
-          data = ward_data(),  # Call the reactive
+          data = initial_ward_data(),  # Call the reactive
           layerId = ~wd22cd,
           fillColor = FALSE,
           color = "black",

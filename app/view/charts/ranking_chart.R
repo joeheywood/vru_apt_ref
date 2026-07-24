@@ -25,7 +25,7 @@ server <- function(id, data, indicatorInput) {
       req(indicatorInput())
       # Prepare the data based on the current value of the indicator input
       prepared_data <- prepare_rankingchart_data(indicatorInput(), data)
-      print(prepared_data) # Debugging
+      # print(prepared_data) # Debugging
       prepared_data
     })
 
