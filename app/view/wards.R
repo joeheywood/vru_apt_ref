@@ -348,7 +348,8 @@ server <- function(id) {
     # Call the ward_basemap module
     ward_basemap$server("ward_basemap",
       ward_data = basemap_data,
-      selected_ward = selected_ward
+      selected_ward = selected_ward,
+      boro = rv
     )
 
     # Call the beeswarm and dynamic text modules

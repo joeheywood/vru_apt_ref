@@ -21,7 +21,8 @@ box::use(
   app / view / charts / ranking_chart,
   app / logic / database[query_ward_data_by_indicator],
   app / logic / rankingChart_utilis[prepare_rankingchart_data],
-  app / view[ward_mapping_data, url_temp, os_mapsattr], # Where is this?
+  # app / view[ward_mapping_data, url_temp, os_mapsattr], # Where is this?
+  app / view[url_temp, os_mapsattr], # Where is this?
   app / view[url_temp, os_mapsattr], # Where is this?
   app / view / react[ProfileMetaData], # Meta data component for this section
 )
@@ -112,7 +113,8 @@ ui <- function(id) {
 #' @export
 server <- function(id) {
   moduleServer(id, function(input, output, session) {
-    quicker <- FALSE
+    quicker <- TRUE
+    boroughs <- readRDS("app/data/boroughs.rds")
     if(quicker) {
       wards_sf <- readRDS("app/data/wards.rds")
     } else {
@@ -124,7 +126,8 @@ server <- function(id) {
     # Create reactive values to track theme changes
     rv <- reactiveValues(
       theme_changed = FALSE,
-      previous_theme = NULL
+      previous_theme = NULL,
+      initial_map = FALSE
     )
 
     # Observer for theme changes
@@ -283,15 +286,60 @@ server <- function(id) {
     })
     
     
-# 
+    # 
     # Map output
     output$map <- renderLeaflet({
       a <- Sys.time()
+      message(paste0("leaflet render: ", Sys.time() - a))
+      
+      l <- leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
+        setView(-0.118092, 51.509865, zoom = 10) |>
+        addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |> 
+        addPolygons(
+          data = boroughs,  # Call the reactive
+          layerId = ~borough_code,
+          fillColor = FALSE,
+          color = "black",
+          weight = 1
+        )
+      
+      message(paste0("leaflet render: ", Sys.time() - a))
+      rv$initial_map <- TRUE
+      l
+    })
+    
+    observe({
+      if(rv$theme_changed == TRUE && rv$initial_map == TRUE) {
+        print("THEME CHANGED. AAAAA")
+        leafletProxy("map", session) |>
+          clearShapes() |> 
+          addPolygons(
+            data = boroughs,
+            fillColor = FALSE,
+            layerId = ~borough_code,
+            color = "#444444",
+            weight = 0.5,
+            opacity = 0.3,
+            fillOpacity = 0.3
+          ) |>
+          setMaxBounds(
+            lng1 = -0.51036,
+            lat1 = 51.28676,
+            lng2 = 0.33402,
+            lat2 = 51.69188
+          )
+      } else {
+        print("NO LONGER CHANGED")
+      }
+    })
+    
+    
+    observe({
+      a <- Sys.time()
       req(filtered_data_reactive())
       filtered_data <- filtered_data_reactive()
-
       req(nrow(filtered_data) > 0)
-
+      message("OK. READY TO ADD DATA")
       if (!"rank" %in% colnames(filtered_data)) {
         filtered_data <- filtered_data |>
           mutate(rank = rank(-value))
@@ -312,9 +360,7 @@ server <- function(id) {
         )
       })
 
-      l <- leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
-        setView(-0.118092, 51.509865, zoom = 10) |>
-        addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
+      leafletProxy("map", session) |>
         addPolygons(
           data = filtered_data,
           fillColor = ~ pal(value),
@@ -332,56 +378,107 @@ server <- function(id) {
           lng2 = 0.33402,
           lat2 = 51.69188
         )
-      
-      message(paste0("leaflet render: ", Sys.time() - a))
-      l
+      message(paste0("leaflet proxy render: ", Sys.time() - a))
     })
-
-    # Highlight style
-    highlight_style <- list(
-      weight = 2,
-      color = "#000000",
-      fillOpacity = 0.0
-    )
-
+    
+    # output$map <- renderLeaflet({
+    #   a <- Sys.time()
+    #   req(filtered_data_reactive())
+    #   filtered_data <- filtered_data_reactive()
+    # 
+    #   req(nrow(filtered_data) > 0)
+    # 
+    #   if (!"rank" %in% colnames(filtered_data)) {
+    #     filtered_data <- filtered_data |>
+    #       mutate(rank = rank(-value))
+    #   }
+    # 
+    #   pal <- colorNumeric(palette = "RdPu", domain = filtered_data$value)
+    # 
+    #   popup_content <- map(1:nrow(filtered_data), function(i) {
+    #     wd22nm <- filtered_data$wd22nm[i]
+    #     value <- filtered_data$value[i]
+    #     borough <- filtered_data$lad22nm[i]
+    #     rank <- filtered_data$rank[i]
+    #     glue(
+    #       "<b>Ward Name:</b> {wd22nm} <br>",
+    #       "<b>Value:</b> {value} <br>",
+    #       "<b>Borough:</b> {borough} <br>",
+    #       "<b>Rank:</b> {rank}"
+    #     )
+    #   })
+    #   
+    #   leafletProxy("map", session) |>
+    #         setView(-0.118092, 51.509865, zoom = 10) |>
+    #          setView(lng = selected_ward$lng, lat = selected_ward$lat, zoom = 10.5) |>
+    # 
+    #     addPolygons(
+    #       data = filtered_data,
+    #       fillColor = ~ pal(value),
+    #       layerId = ~wd22cd,
+    #       color = "#444444",
+    #       weight = 0.9,
+    #       opacity = 0.8,
+    #       fillOpacity = 0.7,
+    #       smoothFactor = 0.5,
+    #       label = map(popup_content, htmltools::HTML)
+    #     ) |>
+    #     setMaxBounds(
+    #       lng1 = -0.51036,
+    #       lat1 = 51.28676,
+    #       lng2 = 0.33402,
+    #       lat2 = 51.69188
+    #     )
+    #   
+    #   message(paste0("leaflet render: ", Sys.time() - a))
+    #   l
+    # })
+    # 
+    # # Highlight style
+    # highlight_style <- list(
+    #   weight = 2,
+    #   color = "#000000",
+    #   fillOpacity = 0.0
+    # )
+    # 
     # Ward selection observer
     observe({
-      # cat("ward observer tick\n")
-      # selected_ward <- NULL
-      # selected_la <- NULL
-      # 
-      # if (!is.null(input$wardInput)) {
-      #   selected_ward_name <- input$wardInput
-      #   selected_ward <- ward_json_data2[ward_json_data2$wd22nm == selected_ward_name, ]
-      # } else if (!is.null(input$map_shape_click)) {
-      #   click <- input$map_shape_click
-      #   if (!is.null(click)) {
-      #     selected_ward <- ward_json_data2[ward_json_data2$wd22nm == click$id, ]
-      #   }
-      # }
-      # 
-      # if (!is.null(selected_ward) && nrow(selected_ward) > 0) {
-      #   selected_la <- la_json_data[la_json_data$lad22cd == selected_ward$lad22cd, ]
-      # 
-      #   leafletProxy("map", session) |>
-      #     clearGroup("highlighted-ward") |>
-      #     clearGroup("highlighted-local-authority") |>
-      #     setView(lng = selected_ward$lng, lat = selected_ward$lat, zoom = 10.5) |>
-      #     addPolygons(
-      #       data = selected_la,
-      #       group = "highlighted-local-authority",
-      #       weight = highlight_style$weight,
-      #       color = highlight_style$color,
-      #       fill = FALSE
-      #     ) |>
-      #     addPolygons(
-      #       data = selected_ward,
-      #       group = "highlighted-ward",
-      #       weight = highlight_style$weight,
-      #       color = highlight_style$color,
-      #       fill = FALSE
-      #     )
-      # }
+      cat("ward observer tick\n")
+      selected_ward <- NULL
+      selected_la <- NULL
+
+      if (!is.null(input$wardInput)) {
+        selected_ward_name <- input$wardInput
+        selected_ward <- ward_json_data2[ward_json_data2$wd22nm == selected_ward_name, ]
+      } else if (!is.null(input$map_shape_click)) {
+        click <- input$map_shape_click
+        if (!is.null(click)) {
+          selected_ward <- ward_json_data2[ward_json_data2$wd22nm == click$id, ]
+        }
+      }
+
+      if (!is.null(selected_ward) && nrow(selected_ward) > 0) {
+        selected_la <- la_json_data[la_json_data$lad22cd == selected_ward$lad22cd, ]
+
+        leafletProxy("map", session) |>
+          clearGroup("highlighted-ward") |>
+          clearGroup("highlighted-local-authority") |>
+          setView(lng = selected_ward$lng, lat = selected_ward$lat, zoom = 10.5) |>
+          addPolygons(
+            data = selected_la,
+            group = "highlighted-local-authority",
+            weight = highlight_style$weight,
+            color = highlight_style$color,
+            fill = FALSE
+          ) |>
+          addPolygons(
+            data = selected_ward,
+            group = "highlighted-ward",
+            weight = highlight_style$weight,
+            color = highlight_style$color,
+            fill = FALSE
+          )
+      }
     })
 # 
     # Beeswarm data reactive
