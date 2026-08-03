@@ -25,8 +25,8 @@ navigation <- Nav(
       list(name = "Home", url = route_link("home"), icon = "Home", key = "home"),
       list(name = "Overview", url = route_link("map"), icon = "AnalyticsReport", key = "map"),
       list(name = "Area Profiles", url = route_link("wards"), icon = "BIDashboard", key = "wards"),
-      list(name = "Weighting", url = route_link("weighting"), icon = "Weights", key = "weighting"),
-      list(name = "Weighting (Borough)", url = route_link("weighting_boro"), icon = "Weights", key = "weighting_boro")
+      list(name = "Weighting", url = route_link("weighting"), icon = "Weights", key = "weighting")
+      # list(name = "Weighting (Borough)", url = route_link("weighting_boro"), icon = "Weights", key = "weighting_boro")
     ))
   ),
   styles = list(

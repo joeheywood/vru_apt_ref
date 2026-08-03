@@ -22,7 +22,7 @@ box::use(
   app / view / layout[makeCard],
   app / view / inputs / toggle,
   app / logic / database[get_themes_df, get_indicators, get_all_indicators],
-  app / logic / run_weightings[run_weightings, get_inds_scores_for_ward]
+  app / logic / run_weightings[run_weightings, run_weightings_borough, get_inds_scores_for_ward]
 )
 
 # UI Function
@@ -51,6 +51,7 @@ ui <- function(id) {
         makeCard(
           title = "Weighting",
           content = div(
+            Toggle.shinyInput(ns("boro_toggle"), label = "Borough Version of Weighting"),
             p(paste0("The APT assigns points to wards based on their ranking for specific ", 
                      "metrics. For instance, if a ward is in the top 15% for an indicator ", 
                      "like 'knife crime offences,' it receives a point. This allows users ", 
@@ -239,23 +240,46 @@ server <- function(id) {
     
     # --- 6. SIMPLIFIED DT: RESULTS ---
     observeEvent(input$run_ranking, {
-      df <- inds_base |>
-        left_join(weights(), by = "indicator")
-      results <- run_weightings(df)
-      rv$top_wards <- results
-      
-      output$top_wards <- renderDT({
-        datatable(
-          results, 
-          selection = "single",
-          colnames = c("Ward Name", "Total Score", "Rank"),
-          options = list(
-            dom = 'tp', # Table and Pagination only
-            pageLength = 20 # Keep it compact
-          ),
-          rownames = FALSE
-        )
-      }, server = FALSE)
+      if(input$boro_toggle == TRUE) {
+        # print("BOROBOROBORO")
+        df <- inds_base |>
+          left_join(weights(), by = "indicator")
+        results <- run_weightings_borough(df)
+        rv$top_wards <- results
+        print(names(results))
+        
+        output$top_wards <- renderDT({
+          datatable(
+            results,
+            selection = "single",
+            colnames = c("Borough Name", "Total Score"),
+            options = list(
+              dom = 'tp', # Table and Pagination only
+              pageLength = 20 # Keep it compact
+            ),
+            rownames = FALSE
+          )
+        }, server = FALSE)
+      } else {
+        df <- inds_base |>
+          left_join(weights(), by = "indicator")
+        results <- run_weightings(df)
+        rv$top_wards <- results
+        
+        output$top_wards <- renderDT({
+          datatable(
+            results, 
+            selection = "single",
+            colnames = c("Ward Name", "Total Score", "Rank"),
+            options = list(
+              dom = 'tp', # Table and Pagination only
+              pageLength = 20 # Keep it compact
+            ),
+            rownames = FALSE
+          )
+        }, server = FALSE)
+        
+      }
       show("download")
     })
     

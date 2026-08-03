@@ -36,6 +36,7 @@ ui <- function(id) {
       makeCard(
         title = "Theme & Indicator Selection",
         content = div(
+          Toggle.shinyInput(ns("boro_toggle"), label = "Show Boroughs Data"),
           TooltipHost(
             content = "Select either an overall ranking or one of the priority areas",
             Dropdown.shinyInput(
@@ -111,6 +112,13 @@ server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ward_json_data2 <- ward_mapping_data
     inds <- readRDS("default_weights.RDS")
+    boroughs <- readRDS("app/data/boroughs.rds")
+    boro_df <- readRDS("borough_version.RDS") |> 
+      mutate(wd22cd = lad22cd, wd22nm = lad22nm)
+    
+    all_boros <- left_join(boroughs, boro_df, by = c(borough_code = "lad22cd")) |> 
+      mutate(lad22cd = borough_code)
+    
 
     # Create reactive values to track theme changes
     rv <- reactiveValues(
@@ -234,16 +242,54 @@ server <- function(id) {
     filtered_data_reactive <- reactive({
       req(input$themeInput, input$indicatorInput)
       validate(need(!rv$theme_changed, "Please select an indicator"))
-
-      ward_json_data2 |>
-        filter(
-          theme == input$themeInput,
-          indicator == input$indicatorInput
-        )
+      if(input$boro_toggle == TRUE) {
+        print("NEED TO CONVERT TO BOROUGH DATA")
+        boroughs |> 
+          left_join(
+            boro_df |> 
+              filter(
+                theme == input$themeInput,
+                indicator == input$indicatorInput),
+            by = c(borough_code = "lad22cd")
+            
+          )
+          
+      } else {
+        ward_json_data2 |>
+          filter(
+            theme == input$themeInput,
+            indicator == input$indicatorInput
+          )
+        
+      }
+      
     })
 
     # Map output
+    ## initial state
     output$map <- renderLeaflet({
+      leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
+        setView(-0.118092, 51.509865, zoom = 10) |>
+        addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
+        addPolygons(
+          data = boroughs,
+          layerId = ~borough_code,
+          color = "#555555",
+          fillColor = "#BBBBBB",
+          weight = 0.9,
+          opacity = 0.8,
+          fillOpacity = 0.7,
+          smoothFactor = 0.5,
+        ) |>
+        setMaxBounds(
+          lng1 = -0.51036,
+          lat1 = 51.28676,
+          lng2 = 0.33402,
+          lat2 = 51.69188
+        )
+    })
+    
+    observe({
       req(filtered_data_reactive())
       filtered_data <- filtered_data_reactive()
 
@@ -268,8 +314,9 @@ server <- function(id) {
           "<b>Rank:</b> {rank}"
         )
       })
-
-      leaflet(options = leafletOptions(minZoom = 10, maxZoom = 18)) |>
+      
+      leafletProxy("map", session) |>
+        clearShapes() |> 
         setView(-0.118092, 51.509865, zoom = 10) |>
         addTiles(urlTemplate = url_temp, attribution = os_mapsattr) |>
         addPolygons(
@@ -289,7 +336,12 @@ server <- function(id) {
           lng2 = 0.33402,
           lat2 = 51.69188
         )
+      
     })
+    
+    # output$map <- renderLeaflet({
+      
+    # })
 
     # Highlight style
     highlight_style <- list(
@@ -342,8 +394,13 @@ server <- function(id) {
     beeswarm_data <- reactive({
       req(input$indicatorInput)
       validate(need(!rv$theme_changed, "Please select an indicator"))
+      if(input$boro_toggle == TRUE) {
+        prepare_beeswarm_data(input$indicatorInput, all_boros)
+      } else {
+        prepare_beeswarm_data(input$indicatorInput, ward_json_data2)
+      }
+      # prepare_beeswarm_data(input$indicatorInput, ward_json_data2)
 
-      prepare_beeswarm_data(input$indicatorInput, ward_json_data2)
     })
 
     #* Beeswarm onclick observer
@@ -373,9 +430,16 @@ server <- function(id) {
       validate(need(!rv$theme_changed, "Please select an indicator"))
       input$indicatorInput
     })
+    
+    is_boroReactive <- reactive({
+      input$boro_toggle
+    })
+    
 
     ranking_chart$server("ranking_chart",
       data = ward_json_data2,
+      boro_data = all_boros,
+      is_boro = is_boroReactive,
       indicatorInput = indicatorInputReactive
     )
   })

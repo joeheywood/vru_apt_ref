@@ -18,13 +18,17 @@ ui <- function(id) {
 
 
 #' @export
-server <- function(id, data, indicatorInput) {
+server <- function(id, data, boro_data, is_boro, indicatorInput) {
   moduleServer(id, function(input, output, session) {
     bar_data <- reactive({
       # Ensure the indicator input is available
       req(indicatorInput())
       # Prepare the data based on the current value of the indicator input
-      prepared_data <- prepare_rankingchart_data(indicatorInput(), data)
+      if(is_boro() == TRUE) {
+        prepared_data <- prepare_rankingchart_data(indicatorInput(), boro_data)
+      } else {
+        prepared_data <- prepare_rankingchart_data(indicatorInput(), data)
+      }
       # print(prepared_data) # Debugging
       prepared_data
     })

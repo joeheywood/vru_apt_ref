@@ -59,6 +59,23 @@ server <- function(id, ward_data, selected_ward) {
           weight = 1
         )
     })
+    
+    
+    observe({
+      req(ward_data())  # Ensure data is available
+      
+      
+      leafletProxy("ward_map") |>
+        clearShapes() |> 
+        setView(-0.118092, 51.509865, zoom = 10) |>
+        addPolygons(
+          data = ward_data(),  # Call the reactive
+          layerId = ~wd22cd,
+          fillColor = FALSE,
+          color = "#121212",
+          weight = 1
+        )
+    })
 
     # Observer to update the map when the selected ward changes
     observeEvent(selected_ward(), {

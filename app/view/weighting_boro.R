@@ -52,9 +52,9 @@ ui <- function(id) {
           title = "Weighting (Borough version)",
           content = div(
             p(paste0("The APT assigns points to boroughs based on their ranking for specific ", 
-                     "metrics. For instance, if a ward is in the top 15% for an indicator ", 
+                     "metrics. For instance, if a borough is in the top 15% for an indicator ", 
                      "like 'knife crime offences,' it receives a point. This allows users ", 
-                     "to compare need across wards and identify priority areas effectively.")),
+                     "to compare need across boroughs and identify priority areas effectively.")),
             
             p(paste0("On this page, you can prioritise, or de-prioritise, indicators, by",
                      " assigning a weight to them. For example, if you wanted to prioritise", 

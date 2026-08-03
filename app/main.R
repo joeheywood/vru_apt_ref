@@ -15,7 +15,7 @@ box::use(
   app / view / home,
   app / view / wards,
   app / view / weighting,
-  app / view / weighting_boro,
+  # app / view / weighting_boro,
   app / view / downloads,
   app / logic / database[init_connection],
 )
@@ -69,8 +69,8 @@ ui <- function(id) {
           route("map", map$ui(ns("map"))),
           route("home", home$ui(ns("home"))),
           route("wards", wards$ui(ns("wards"))),
-          route("weighting", weighting$ui(ns("weighting"))),
-          route("weighting_boro", weighting$ui(ns("weighting_boro")))
+          route("weighting", weighting$ui(ns("weighting")))
+          # route("weighting_boro", weighting$ui(ns("weighting_boro")))
         )
       )
     ),
@@ -177,23 +177,23 @@ server <- function(id) {
     }, ignoreInit = TRUE)
     
     # Only Initialise wards module when wards page is visited
-    observeEvent(session$clientData$url_hash, {
-      if (grepl("#!/weighting_boro", session$clientData$url_hash)) {
-        # Show loading screen if module not yet loaded
-        if (!module_status$weighting_boro_loaded) {
-          show_loading()
-          
-          # Initialise module
-          wt <- weighting_boro$server("weighting_boro")
-          
-          
-          # Add slight delay before hiding loading to ensure UI has updated
-          shinyjs::delay(300, {
-            hide_loading()
-          })
-        }
-      }
-    }, ignoreInit = TRUE)
+    # observeEvent(session$clientData$url_hash, {
+    #   if (grepl("#!/weighting_boro", session$clientData$url_hash)) {
+    #     # Show loading screen if module not yet loaded
+    #     if (!module_status$weighting_boro_loaded) {
+    #       show_loading()
+    #       
+    #       # Initialise module
+    #       wt <- weighting_boro$server("weighting_boro")
+    #       
+    #       
+    #       # Add slight delay before hiding loading to ensure UI has updated
+    #       shinyjs::delay(300, {
+    #         hide_loading()
+    #       })
+    #     }
+    #   }
+    # }, ignoreInit = TRUE)
     
     
     # Disconnect when session ends
