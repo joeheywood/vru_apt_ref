@@ -183,6 +183,7 @@ server <- function(id) {
     # Geometry data for map (filtered by borough if selected)
     basemap_data <- reactive({
       req(active_theme())
+      print("BOROUGH SELECTED")
       
       get_ward_mapping_data(
         theme = active_theme(),

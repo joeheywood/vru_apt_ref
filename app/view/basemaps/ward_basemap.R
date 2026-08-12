@@ -63,6 +63,7 @@ server <- function(id, ward_data, selected_ward) {
     
     observe({
       req(ward_data())  # Ensure data is available
+      print("CHANGED WARD DATA")
       
       
       leafletProxy("ward_map") |>
